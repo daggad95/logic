@@ -1,28 +1,12 @@
 import java.util.LinkedList;
 ArrayList<Tile> tiles;
+Tile link1;
+Tile link2;
 
 void setup(){
   size(1000, 500);
   
   tiles = new ArrayList<Tile>();
-  
-  StateTile tile = new StateTile(new PVector(100, 100), true);
-  tiles.add(tile);
-  for (int i = 1; i < 10; i++) {
-    tile = new StateTile(new PVector(100 + 50 * i, 100), false);
-    tiles.add(tile);
-    tiles.get(i - 1).linkTo(tile);
-  }
-  
-  StateTile tile2 = new StateTile(new PVector(200, 150), false);
-  StateTile tile3 = new StateTile(new PVector(200, 200), false);
-  StateTile tile4 = new StateTile(new PVector(200, 250), false);
-  tiles.add(tile2);
-  tiles.add(tile3);
-  tiles.add(tile4);
-  tiles.get(2).linkTo(tile2);
-  tile2.linkTo(tile3);
-  tile3.linkTo(tile4);
 }
 
 void draw() {
@@ -31,10 +15,52 @@ void draw() {
   for (Tile tile : tiles) {
     tile.draw();
   }
+  
+  stroke(255);
+  noFill();
+  rect((int) (mouseX - Tile.SIZE / 2) / (int) Tile.SIZE * (int) Tile.SIZE, 
+       (int) (mouseY - Tile.SIZE / 2) / (int) Tile.SIZE * (int) Tile.SIZE,
+       Tile.SIZE, Tile.SIZE);
 }
 
 void keyPressed() {
   if (key == ' ') {
-    tiles.get(0).propagate();
+    link1.propagate();
+  }
+}
+
+Tile selectTile() {
+  for (Tile tile : tiles) {
+    PVector mPos = getGridCoords(mouseX, mouseY);
+    
+    if (mPos.x == tile.pos.x && mPos.y == tile.pos.y) 
+      return tile;
+  }
+  return null;
+}
+
+public PVector getGridCoords(float x, float y) {
+  float newX = (int) (x - Tile.SIZE / 2) / (int) Tile.SIZE * (int) Tile.SIZE;
+  float newY = (int) (y - Tile.SIZE / 2) / (int) Tile.SIZE * (int) Tile.SIZE;
+  
+  return new PVector(newX, newY);
+}
+
+void mousePressed() {
+  if (mouseButton == LEFT)
+    tiles.add(new StateTile(getGridCoords(mouseX, mouseY), false));
+  if (mouseButton == RIGHT) {
+    if (link1 == null) {
+      link1 = selectTile();
+    }
+    else {
+      link2 = selectTile();
+      
+      if (link2 != null) {
+        link1.linkTo(link2);
+        link1 = null;
+        link2 = null;
+      }
+    }
   }
 }

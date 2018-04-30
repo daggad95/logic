@@ -1,5 +1,5 @@
 class Tile {
-  final float SIZE = 20;
+  final static float SIZE = 20;
   PVector pos;
   ArrayList<Tile> connections;
   LinkedList<Tile> pTiles;
